@@ -1,6 +1,6 @@
 # Steel-defect-detector_segmentation
 
-
+![image](images/header.jpg)
 
 ## Installation
 
