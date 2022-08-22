@@ -1,16 +1,21 @@
 # Steel-defect-detector_segmentation
 
-![image](images/header.jpg)
+![header](images/header.png)
+Source from Kaggle: [Severstal: Steel Defect Detection](https://www.kaggle.com/c/severstal-steel-defect-detection)
 
-## Installation
+## Requirements
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+1) keras_applications
+2) image-classifiers
+3) efficientnet
+4) segmentation_models
+- Source from: https://github.com/qubvel/segmentation_models
 
 ```bash
-pip install foobar
+pip install -r requirements.txt
 ```
 
-## Usage
+## Introduction
 
 ```python
 import foobar
