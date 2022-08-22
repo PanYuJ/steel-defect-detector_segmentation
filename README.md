@@ -1,1 +1,1 @@
-# steel-defect-detector_segmentation
+# Steel-defect-detector_segmentation
