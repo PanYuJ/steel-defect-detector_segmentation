@@ -29,12 +29,17 @@ pip install -r requirements.txt
 <img src="images/defect4-1.png" align="center" width="50%"/><img src="images/defect4-2.png" align="center" width="50%"/>
 
 - The percentage of each defect are shown as below. The percentage defect 3 is more than half of dataset. 
-<img src="images/data_statistics.png" align="center" width="60%"/>
+<img src="images/data_static.png" align="center" width="60%"/>
 
-## Model
-- ResUnet
-<img src="images/defect1-2.png" align="center" width="50%"/>
+## Define trainng model
+- ResUnet (Residual U-Net)
+<img src="images/unet model.png" align="center" width="80%"/>
 
+- Loss function
+  - Catagorical_cross_entropy + Dice loss
+  - Catagorical_cross_entropy (add class_weights for each class to balance dataset.)
+- Optimizer
+  - Adam 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
