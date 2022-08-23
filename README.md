@@ -17,18 +17,23 @@ pip install -r requirements.txt
 
 ## Introduction
 
-```python
-import foobar
+- Four defects type in dataset. The image of each defect type is shown as below.
 
-# returns 'words'
-foobar.pluralize('word')
+  - Defect 1.  
+<img src="images/defect1-1.png" align="center" width="50%"/><img src="images/defect1-2.png" align="center" width="50%"/>
+  - Defect 2.  
+<img src="images/defect2-1.png" align="center" width="50%"/><img src="images/defect2-2.png" align="center" width="50%"/>
+  - Defect 3.  
+<img src="images/defect3-1.png" align="center" width="50%"/><img src="images/defect3-2.png" align="center" width="50%"/>
+  - Defect 4.  
+<img src="images/defect4-1.png" align="center" width="50%"/><img src="images/defect4-2.png" align="center" width="50%"/>
 
-# returns 'geese'
-foobar.pluralize('goose')
+- The percentage of each defect are shown as below. The percentage defect 3 is more than half of dataset. 
+<img src="images/data_statistics.png" align="center" width="60%"/>
 
-# returns 'phenomenon'
-foobar.singularize('phenomena')
-```
+## Model
+- ResUnet
+<img src="images/defect1-2.png" align="center" width="50%"/>
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
