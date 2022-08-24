@@ -36,14 +36,19 @@ pip install -r requirements.txt
 <img src="images/unet model.png" align="center" width="80%"/>
 
 - Loss function
-  - Catagorical_cross_entropy + Dice loss
-  - Catagorical_cross_entropy (add class_weights for each class to balance dataset.)
+  - Add class_weights for each class to balance dataset.
+  - ``Catagorical_cross_entropy`` + ``Dice loss``
+  - ``Catagorical_cross_entropy`` 
 - Optimizer
-  - Adam 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+  - ``Adam``
+   
+## Evaluation
+ - Create confusion matrix for each pixel. It is shown as below. 
+ - The precision of model using CCE is better than using CCE+Dice in this case.
+ - 
+|CCE|CCE+Dice|
+|:--:|:--:|
+|<img src="images/cm_cce_class-weight.png" align="center" width="70%"/>|<img src="images/cm_cce_dice_class-weight.png" align="center" width="70%"/>|
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
