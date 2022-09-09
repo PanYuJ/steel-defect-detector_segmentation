@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 ## Introduction
 
-- Four defects type in dataset. The image of each defect type is shown as below.
+- Four defects type in dataset. The example of each defect type is shown as below.
 
   - Defect 1.  
 <img src="images/defect1-1.png" align="center" width="50%"/><img src="images/defect1-2.png" align="center" width="50%"/>
@@ -30,6 +30,12 @@ pip install -r requirements.txt
 
 - The percentage of each defect are shown as below. The percentage defect 3 is more than half of dataset. 
 <img src="images/data_static.png" align="center" width="60%"/>
+
+- Analyze mask area sizes  
+<img src="images/defect_pixel_jistogram1.png" align="center" width="50%"/>
+
+- Plot images with large mask areas(>200000 pixel) picked by random index.  Defect 3 masks seem to contain a lot of empty space without any defects.  
+<img src="images/image with large mask_defect3.png" align="center" width="50%"/>
 
 ## Define trainng model
 - ResUnet (Residual U-Net)
