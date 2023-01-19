@@ -3,8 +3,15 @@ import zipfile
 import pandas as pd
 import sklearn
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 # https://www.kaggle.com/competitions/severstal-steel-defect-detection
+
+def split_df(df, trsize):
+  train_df, valid_df = train_test_split(df, train_size=trsize, shuffle=True, random_state=123)
+  
+  print('train_df length: ', len(train_df), 'valid_df length: ', len(valid_df)) 
+  return train_df, valid_df    
 
 def loader(file_path):
  
@@ -44,7 +51,10 @@ def loader(file_path):
     train_df2_drop = train_df2.drop(train_df2[train_df2['count']==0].index)
     train_df2_shuffle = sklearn.utils.shuffle(train_df2_drop, random_state=2000)
     train_df2_shuffle.reset_index(inplace=True,drop=True)
-
-    return train_df2_shuffle
+    
+    # Split dataset to train dataset and vaildation dataset
+    train_df, valid_df  = split_df(train_df2_shuffle, 0.9)
+    
+    return train_df, valid_df
 
 
