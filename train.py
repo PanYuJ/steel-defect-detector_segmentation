@@ -44,10 +44,6 @@ def train(opt):
   es = EarlyStopping(monitor='val_loss', patience= 10 , mode = 'min')
   
   # Create model for segmentation
-  input_shape = img_size
-  # classes = 5 # 4+1 (including background)
-
-  weight_path = weights
   model = model_seg(backbone, input_shape=img_size, classes=class_num, weight=weights)
 
   file_path = './kaggle'
@@ -58,10 +54,7 @@ def train(opt):
   # Define custom callback functions
   callback_list = [reduce_lr, CP_callback, log_csv, es]
 
-  # Define preprocess for data
-  preprocess_input = preprocess
   # Prepare training data and validation data.
-
   augmentations = A.Compose([ A.HorizontalFlip(p=0.5),
                               A.VerticalFlip(p=0.5),
                               ], p=0.75)
@@ -70,7 +63,7 @@ def train(opt):
                                 img_path=file_path, 
                                 subset='train', 
                                 shuffle=True,  
-                                preprocess=preprocess_input, 
+                                preprocess=preprocess, 
                                 augment_transform=augmentations, 
                                 label_sparse=False, 
                                 label_mode='binary'
@@ -80,13 +73,13 @@ def train(opt):
                               img_path=file_path, 
                               subset='val', 
                               shuffle=False, 
-                              preprocess=preprocess_input, 
+                              preprocess=preprocess, 
                               label_sparse=False, 
                               label_mode='binary'
                              )
 
   history = model.fit(train_batches, validation_data = val_batches, epochs=50 ,verbose=1, callbacks=callback_list)
-opt.save_dir, opt.epochs, opt.batch_size, opt.weights, opt.img_size, opt.backbone_name, opt.class_num
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_dir', type=str, default='./result', help='save path for training weight and log.csv')
@@ -94,6 +87,6 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=15, help='total batch size for all GPUs')
     parser.add_argument('--weights', type=str, default='', help='hyperparameters path')
     parser.add_argument('--img_size', nargs='+', type=int, default=[256, 1600, 1], help='[height, width, channel] image sizes')
-    parser.add_argument('--backbone_name', type=str, default='efficientnetb2', help='model backbone. efficientnetb0-5, resnet34')
+    parser.add_argument('--backbone', type=str, default='efficientnetb2', help='model backbone. efficientnetb0-5, resnet34')
     parser.add_argument('--class_num', type=int, default=4)
     opt = parser.parse_args()
