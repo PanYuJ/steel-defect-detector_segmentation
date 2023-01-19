@@ -2,41 +2,41 @@
 import tensorflow as tf
 import segmentation_models
 from segmentation_models import Unet
+from segmentation_models import FPN
 from utils.metrics import F1_score
+from utils.loss import BCEDiceLoss
+from utils.loss import CCEDiceLoss
 
 segmentation_models.set_framework('tf.keras')
 segmentation_models.framework()
 
-def model_unet(BACKBONE='resnet34', input_shape=(256,1600,1) , classes=4):
+def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4):
   
   """
   Arg:
     BACKBONE: 'resnet18', 'resnet34', 'resnet50'.
+              'efficientnetb0', 'efficientnetb1', 'efficientnetb2',
+              'efficientnetb3', 'efficientnetb4', 'efficientnetb5'
+              
     input_shape: The shape of image.
     classes: The count of defect type (including background)
   """
   
-  ## Loss function:
-  class_weight = [10,10,1,6,1]
-
   # Define metrics
-  iou_score = segmentation_models.metrics.IOUScore(per_image=True)
-
+  F1_score = F1_score()
+  
   # Define loss functions
-  dice_loss = segmentation_models.losses.DiceLoss(per_image=True)
-  cce = segmentation_models.losses.CategoricalCELoss(class_weights=class_weight) # CategoricalCELoss with class_weights
-  cce_dice = dice_loss + cce # Categorical_cross_entropy + Dice_loss
-  focal_cce = segmentation_models.losses.CategoricalFocalLoss()
-
+  bce_dice_loss = BCEDiceLoss( class_nums=4, BCE_weights=0.5, Dice_weights=0.5, per_image_all=True ,threshold=0.5, soft_mode=False)
+  cce_dice_loss = CCEDiceLoss( class_nums=5, CCE_weights=0.75, Dice_weights=0.25)
+  
   # Define optimizers
   sgd = tf.keras.optimizers.SGD(lr=1E-3, momentum=0.9, nesterov=True)
-  adam = tf.keras.optimizers.Adam(learning_rate=0.005)
+  adam = tf.keras.optimizers.Adam(learning_rate=0.003)
   RMSprop = tf.keras.optimizers.RMSprop(learning_rate=0.005)
   
   # LOAD UNET WITH PRETRAINING FROM IMAGENET
-
   backbone = BACKBONE
-  model = Unet(BACKBONE, input_shape=input_shape, classes=classes, activation='sigmoid', encoder_weights=None)
-  model.compile(optimizer=adam, loss=cce_dice, metrics=[F1_score()])
+  model = FPN(BACKBONE, input_shape=input_shape, classes=classes, activation='sigmoid', encoder_weights=None)
+  model.compile(optimizer=adam, loss=bce_dice_loss, metrics=[F1_score()])
   
   return model
