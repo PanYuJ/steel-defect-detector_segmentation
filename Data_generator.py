@@ -13,7 +13,8 @@ augmentations = A.Compose([ A.HorizontalFlip(p=0.5),
 class DataGenerator(tf.keras.utils.Sequence):
   def __init__(self, df, 
                batch_size = 8, 
-               subset="train", 
+               subset="train",
+               img_size=(height, width)
                shuffle=False, 
                preprocess=None, 
                auto_sample_weights=False, 
@@ -48,7 +49,7 @@ class DataGenerator(tf.keras.utils.Sequence):
     elif self.subset == "val":
       self.data_path = path + 'train_images/'
     elif self.subset == "test":
-      self.data_path = path + 'train_images/'
+      self.data_path = path + 'test_images/'
       
     self.on_epoch_end()
 
@@ -64,20 +65,20 @@ class DataGenerator(tf.keras.utils.Sequence):
     
     if self.plot_mode:
       # store image and label in RGB 
-      X = np.empty((self.batch_size,256,1600,3),dtype=np.float32)
+      X = np.empty((self.batch_size,img_size[0],img_size[1],3),dtype=np.float32)
     else:
       # store image and label in grayscale mode
-      X = np.empty((self.batch_size,256,1600,1),dtype=np.float32)
+      X = np.empty((self.batch_size,img_size[0],img_size[1],1),dtype=np.float32)
 
     # Convert rle to mask
     if self.mask_label_mode =='multi':
       if self.label_sparse:
-        y = np.zeros((self.batch_size,256,1600,1),dtype=np.float32)
+        y = np.zeros((self.batch_size,img_size[0],img_size[1],1),dtype=np.float32)
       else:
-        y = np.zeros((self.batch_size,256,1600,5),dtype=np.float32)
+        y = np.zeros((self.batch_size,img_size[0],img_size[1],5),dtype=np.float32)
 
     if self.mask_label_mode =='binary':
-        y = np.zeros((self.batch_size,256,1600,4),dtype=np.float32)
+        y = np.zeros((self.batch_size,img_size[0],img_size[1],4),dtype=np.float32)
 
     indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
     for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
@@ -87,14 +88,14 @@ class DataGenerator(tf.keras.utils.Sequence):
         # load image in RGB
         image = cv2.imread(self.data_path + f, cv2.IMREAD_COLOR)
         image = image.astype(np.float32)
-        image = cv2.resize(image,(1600,256),interpolation=cv2.INTER_NEAREST)
+        image = cv2.resize(image,(img_size[1],img_size[0]),interpolation=cv2.INTER_NEAREST)
         X[i,] = image
         
       else:
         # load image in grayscale
         image = cv2.imread(self.data_path + f, cv2.IMREAD_GRAYSCALE)
         image = image.astype(np.float32)
-        image = cv2.resize(image,(1600,256),interpolation=cv2.INTER_NEAREST)
+        image = cv2.resize(image,(img_size[1],img_size[0]),interpolation=cv2.INTER_NEAREST)
         image = image[:,:,np.newaxis]
         X[i,] = image
 
@@ -104,14 +105,14 @@ class DataGenerator(tf.keras.utils.Sequence):
           if self.label_sparse: 
             for j in range(4):
               rle_msk = rle2mask(self.df['e'+str(j+1)].iloc[indexes[i]])*(j+1)
-              rle_msk = cv2.resize(rle_msk, (1600,256),interpolation=cv2.INTER_NEAREST)     
+              rle_msk = cv2.resize(rle_msk, (img_size[1],img_size[0]),interpolation=cv2.INTER_NEAREST)     
               y[i,rle_msk==1,0] = j+1
 
           else:
             for j in range(4):
               rle_msk = rle2mask(self.df['e'+str(j+1)].iloc[indexes[i]])
               rle_msk = rle_msk.astype(np.float32)
-              rle_msk = cv2.resize(rle_msk, (1600,256),interpolation=cv2.INTER_NEAREST)
+              rle_msk = cv2.resize(rle_msk, (img_size[1],img_size[0]),interpolation=cv2.INTER_NEAREST)
               y[i,:,:,j+1] = rle_msk
             y[i,:,:,0] = 1-y[i,:,:,1:5].sum(-1)
 
@@ -119,7 +120,7 @@ class DataGenerator(tf.keras.utils.Sequence):
           for j in range(4):
             rle_msk = rle2mask(self.df['e'+str(j+1)].iloc[indexes[i]])
             rle_msk = rle_msk.astype(np.float32)
-            rle_msk = cv2.resize(rle_msk, (1600,256),interpolation=cv2.INTER_NEAREST)
+            rle_msk = cv2.resize(rle_msk, (img_size[1],img_size[0]),interpolation=cv2.INTER_NEAREST)
             y[i,:,:,j] = rle_msk
               
         if self.preprocess!=None:
@@ -127,7 +128,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         
         # Store sample weights array
         if self.auto_sample_weights:
-          sample_weights = np.empty((self.batch_size,256,1600,1),dtype=np.float32)
+          sample_weights = np.empty((self.batch_size,img_size[0],img_size[1],1),dtype=np.float32)
 
         # Agumentation
         if self.augment_transform != None:
