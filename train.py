@@ -94,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=50,)
     parser.add_argument('--batch_size', type=int, default=15, help='total batch size for all GPUs')
     parser.add_argument('--weights', type=str, default='', help='hyperparameters path')
-    parser.add_argument('--img_size', nargs='+', type=int, default=[256, 1600], help='[height, width] image sizes')
+    parser.add_argument('--img_size', nargs='+', type=int, default=[256, 1600, 1], help='[height, width, channel] image sizes')
     parser.add_argument('--backbone_name', type=str, default='efficientnetb2', help='model backbone. efficientnetb0-5, resnet34')
     parser.add_argument('--class_num', type=int, default=4)
     opt = parser.parse_args()
