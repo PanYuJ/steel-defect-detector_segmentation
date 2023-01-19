@@ -44,12 +44,11 @@ def train(opt):
   es = EarlyStopping(monitor='val_loss', patience= 10 , mode = 'min')
   
   # Create model for segmentation
-  BACKBONE = backbone
   input_shape = img_size
   # classes = 5 # 4+1 (including background)
-  classes = class_num
+
   weight_path = weights
-  model = model_seg(BACKBONE, input_shape, classes, weight=weights)
+  model = model_seg(backbone, input_shape=img_size, classes=class_num, weight=weights)
 
   file_path = './kaggle'
   
