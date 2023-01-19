@@ -10,7 +10,7 @@ from utils.loss import CCEDiceLoss
 segmentation_models.set_framework('tf.keras')
 segmentation_models.framework()
 
-def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4):
+def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, weight_path=None):
   
   """
   Arg:
@@ -19,7 +19,8 @@ def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4):
               'efficientnetb3', 'efficientnetb4', 'efficientnetb5'
               
     input_shape: The shape of image.
-    classes: The count of defect type (including background)
+    classes: The count of defect type (if including background, classes equal to 5).
+    weight_path: Model weight file path.
   """
   
   # Define metrics
@@ -39,4 +40,7 @@ def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4):
   model = FPN(BACKBONE, input_shape=input_shape, classes=classes, activation='sigmoid', encoder_weights=None)
   model.compile(optimizer=adam, loss=bce_dice_loss, metrics=[F1_score()])
   
+  if weight_path!=None:
+    model.load_weights(weight_path)
+    
   return model
