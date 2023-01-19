@@ -14,7 +14,8 @@ class DataGenerator(tf.keras.utils.Sequence):
   def __init__(self, df, 
                batch_size = 8, 
                subset="train",
-               img_size=(height, width)
+               img_size=(height, width),
+               img_path = None
                shuffle=False, 
                preprocess=None, 
                auto_sample_weights=False, 
@@ -32,6 +33,7 @@ class DataGenerator(tf.keras.utils.Sequence):
     """
     super().__init__()
     self.df = df
+    self.img_path = img_path
     self.shuffle = shuffle
     self.subset = subset
     self.batch_size = batch_size
@@ -45,11 +47,11 @@ class DataGenerator(tf.keras.utils.Sequence):
     self.mask_label_mode = mask_label_mode
     
     if self.subset == "train":
-      self.data_path = path + 'train_images/'
+      self.data_path = self.img_path + 'train_images/'
     elif self.subset == "val":
-      self.data_path = path + 'train_images/'
+      self.data_path = self.img_path + 'train_images/'
     elif self.subset == "test":
-      self.data_path = path + 'test_images/'
+      self.data_path = self.img_path + 'test_images/'
       
     self.on_epoch_end()
 
