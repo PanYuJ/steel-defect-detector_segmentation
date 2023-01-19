@@ -4,6 +4,7 @@ import pandas as pd
 import sklearn
 import numpy as np
 from sklearn.model_selection import train_test_split
+from utils import crop_image
 
 # https://www.kaggle.com/competitions/severstal-steel-defect-detection
 
@@ -55,6 +56,12 @@ def loader(file_path):
     # Split dataset to train dataset and vaildation dataset
     train_df, valid_df  = split_df(train_df2_shuffle, 0.9)
     
-    return train_df, valid_df
+    if crop:
+      crop_df_train = crop_image(train_df, subset='train', save_path='/content/kaggle', load_path='/content/kaggle/train_images', crop_w_ratio=0.25, crop_h_ratio=1.0)
+      crop_df_val = crop_image(valid_df, subset='val', save_path='/content/kaggle', load_path='/content/kaggle/train_images', crop_w_ratio=0.25, crop_h_ratio=1.0)
+      return crop_df_train, crop_df_val
+    
+    else:
+      return train_df, valid_df
 
 
