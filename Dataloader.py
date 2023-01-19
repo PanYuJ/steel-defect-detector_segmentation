@@ -59,6 +59,22 @@ def loader(file_path):
     if crop:
       crop_df_train = crop_image(train_df, subset='train', save_path='/content/kaggle', load_path='/content/kaggle/train_images', crop_w_ratio=0.25, crop_h_ratio=1.0)
       crop_df_val = crop_image(valid_df, subset='val', save_path='/content/kaggle', load_path='/content/kaggle/train_images', crop_w_ratio=0.25, crop_h_ratio=1.0)
+      crop_df_train.fillna('',inplace=True)
+      crop_df_val.fillna('',inplace=True)
+      crop_df_train['count'] = np.sum(crop_df_train.iloc[:,1:5]!='',axis=1).values
+      crop_df_train.reset_index(inplace=True,drop=True)
+
+      crop_df_val['count'] = np.sum(crop_df_val.iloc[:,1:5]!='',axis=1).values
+      crop_df_val.reset_index(inplace=True,drop=True)
+
+      crop_df_train = crop_df_train.drop(crop_df_train[crop_df_train['count']==0].index)
+      crop_df_train = sklearn.utils.shuffle(crop_df_train, random_state=2000)
+      crop_df_train.reset_index(inplace=True,drop=True)
+
+      crop_df_val = crop_df_val.drop(crop_df_val[crop_df_val['count']==0].index)
+      crop_df_val = sklearn.utils.shuffle(crop_df_val, random_state=2000)
+      crop_df_val.reset_index(inplace=True,drop=True)
+      
       return crop_df_train, crop_df_val
     
     else:
