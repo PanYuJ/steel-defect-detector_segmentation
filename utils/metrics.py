@@ -33,7 +33,7 @@ class F1_score(tf.keras.metrics.Metric):
     self.false_negatives.assign(0)
 
 # Plot confusion_matrix
-def plot_confusion_matrix(cm, target_names, title_name=None, cmap=None, normalize=True):
+def plot_confusion_matrix(cm, target_names, title_name=None, cmap=None, normalize=True, result_name='result.png'):
   
   accuracy = np.trace(cm) / float(np.sum(cm))
   misclass = 1 - accuracy
@@ -70,6 +70,7 @@ def plot_confusion_matrix(cm, target_names, title_name=None, cmap=None, normaliz
   plt.tight_layout()
   plt.ylabel('True label')
   plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+  plt.savefig(result_name) 
   plt.show()
 
 
