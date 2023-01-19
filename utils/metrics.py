@@ -2,6 +2,36 @@ import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Define metrics
+class F1_score(tf.keras.metrics.Metric):
+
+  def __init__(self, name='F1_score', **kwargs):
+    super().__init__(name=name, **kwargs)
+    self.true_positives = self.add_weight(name='tp', initializer='zeros')
+    self.false_positives = self.add_weight(name='fp', initializer='zeros')
+    self.false_negatives = self.add_weight(name='fn', initializer='zeros')
+
+  def update_state(self, y_true, y_pred, threshold=0.5, sample_weight=None):
+    y_true = tf.cast(y_true, 'float')
+    y_pred = tf.cast(tf.greater(tf.cast(y_pred, 'float'), threshold), 'float')
+
+    self.true_positives.assign_add(tf.reduce_sum(tf.multiply(y_true,y_pred)))
+    self.false_positives.assign_add(tf.reduce_sum((1 - y_true) * y_pred))
+    self.false_negatives.assign_add(tf.reduce_sum(y_true * (1 - y_pred)))
+
+  def result(self):
+    p = self.true_positives / (self.true_positives + self.false_positives + K.epsilon())
+    r = self.true_positives / (self.true_positives + self.false_negatives + K.epsilon())
+
+    f1 = 2*( p * r ) / (p + r + K.epsilon())
+    f1 = tf.where(tf.math.is_nan(f1), tf.zeros_like(f1), f1)
+    return K.mean(f1)
+
+  def reset_state(self):
+    self.true_positives.assign(0)
+    self.false_positives.assign(0)
+    self.false_negatives.assign(0)
+
 # Plot confusion_matrix
 def plot_confusion_matrix(cm, target_names, title_name=None, cmap=None, normalize=True):
   
