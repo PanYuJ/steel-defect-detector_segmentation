@@ -10,7 +10,7 @@ from utils.loss import CCEDiceLoss
 segmentation_models.set_framework('tf.keras')
 segmentation_models.framework()
 
-def model_unet(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, weight_path=None):
+def model_seg(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, weight_path=None):
   
   """
   Arg:
