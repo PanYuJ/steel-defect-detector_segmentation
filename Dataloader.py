@@ -37,9 +37,14 @@ def loader(file_path):
     train_df2['count'] = np.sum(train_df2.iloc[:,1:]!='',axis=1).values
     
     # Shuffle list
-    train_df2_shuffle = sklearn.utils.shuffle(train_df2, random_state=2000)
-    train_df2_shuffle.reset_index(inplace=True, drop=True)
+    train_df2= sklearn.utils.shuffle(train_df2, random_state=2000)
+    train_df2.reset_index(inplace=True, drop=True)
     
+    # Remove data without defect
+    train_df2_drop = train_df2.drop(train_df2[train_df2['count']==0].index)
+    train_df2_shuffle = sklearn.utils.shuffle(train_df2_drop, random_state=2000)
+    train_df2_shuffle.reset_index(inplace=True,drop=True)
+
     return train_df2_shuffle
 
 
