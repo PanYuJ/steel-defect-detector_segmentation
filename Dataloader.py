@@ -14,12 +14,13 @@ def split_df(df, trsize):
   print('train_df length: ', len(train_df), 'valid_df length: ', len(valid_df)) 
   return train_df, valid_df    
 
-def loader(file_path):
+def loader(file_path, crop=False):
  
     """
     Arg:
       file_path: The path of repository that storing Raw datas.
       zip_path: The path of zip file.
+      crop: Crop image into 
     """
   # Extract zip file including image and label after download from Kaggle  
     if not os.path.isdir(file_path):
