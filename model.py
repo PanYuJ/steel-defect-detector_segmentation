@@ -10,7 +10,7 @@ from utils.loss import CCEDiceLoss
 segmentation_models.set_framework('tf.keras')
 segmentation_models.framework()
 
-def model_seg(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, weight_path=None):
+def model_seg(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, weight_path=''):
   
   """
   Arg:
@@ -40,7 +40,7 @@ def model_seg(BACKBONE='efficientnetb2', input_shape=(256,1600,1) , classes=4, w
   model = FPN(BACKBONE, input_shape=input_shape, classes=classes, activation='sigmoid', encoder_weights=None)
   model.compile(optimizer=adam, loss=bce_dice_loss, metrics=[F1_score()])
   
-  if weight_path!=None:
+  if weight_path!='':
     model.load_weights(weight_path)
     
   return model
