@@ -21,10 +21,13 @@ pip install -r requirements.txt
 
   - Defect 1.  
 <img src="images/defect1-1.png" align="center" width="50%"/>
+
   - Defect 2.  
 <img src="images/defect2-1.png" align="center" width="50%"/>
+
   - Defect 3.  
 <img src="images/defect3-1.png" align="center" width="50%"/>
+
   - Defect 4.  
 <img src="images/defect4-1.png" align="center" width="50%"/>
 
