@@ -1,23 +1,25 @@
-from utils.metrics import plot_confusion_matrix
+
+import argparse
+import os
 import tensorflow as tf
-from model import model_unet as model
-from Dataloader import loader as loader
-from Data_generator import DataGenerator as DataGenerator
-from utils.preprocess import preprocess as preprocess
-from sklearn.metrics import confusion_matrix
 import numpy as np
 from keras import backend as K
 
+from model import model_unet as model
+from Dataloader import loader as loader
+from Data_generator import DataGenerator as DataGenerator
+from utils.metrics import plot_confusion_matrix
+from utils.preprocess import preprocess as preprocess
+from sklearn.metrics import confusion_matrix
+
 def evaluator(opt):
   
-  result_save,  weights, img_size, backbone, class_num= \
-        opt.result_save, opt.weights, opt.img_size, opt.backbone, opt.class_num,
+  weights, img_size, backbone, class_num= opt.weights, opt.img_size, opt.backbone, opt.class_num
   
- # Create repository to store training weight
-  mdir = result_save / 'matrix'
-  mdir.mkdir(parents=True, exist_ok=True)  # make dir
-  result = mdir / 'confusion_matrix.png'
-  
+ # Create repository to store evaluating results.
+  if not os.path.exists(save_dir):
+    os.mkdir(opts.save_path)
+    
   model = model(backbone, img_shape=img_size, classes=class_num, weights=weights)
 
   # Create dataframe for evaluating .
@@ -27,7 +29,19 @@ def evaluator(opt):
   # set the evaluation data to batch to avoid OOM.
   # 100 image per batch.
   blockLength = 100
-  cm_sum = np.zeros(shape=(5,5))
+  
+  # Find threshold to get best f1_score
+  thresholds = [np.round(x, 1) for x in np.arange(0, 1, 0.1)]
+  result = pd.DataFrame(columns=['threshold', 'true_positives', 'false_positives', 'false_negatives', 'precision', 'recall', 'f1_score'])
+  
+  result['threshold'] = thresholds
+  for i in range(len(result)):
+    result['true_positives'].iloc[i] = [0,0,0,0]
+    result['false_positives'].iloc[i] = [0,0,0,0]
+    result['false_negatives'].iloc[i] = [0,0,0,0]
+    result['precision'].iloc[i] = [0,0,0,0]
+    result['recall'].iloc[i] = [0,0,0,0]
+    result['f1_score'].iloc[i] = [0,0,0,0]
   
   # Predict.
   for begin in np.arange(0,len(val_df),blockLength):
@@ -43,30 +57,32 @@ def evaluator(opt):
 
     predict_mask = model.predict(test_batch, verbose=1)
 
-    for i, predict_mask_batch in enumerate(predict_mask):
-      test_batch_msk = np.squeeze(test_batch[i][1], axis=0)   
-      g_true = np.zeros(shape=(img_size[0],img_size[1]))
+    for i, true_batch in enumerate(test_batch):
+      pred = predict_result[idx]
+    true_batch_squ = np.squeeze(true_batch[1], axis=0)
 
-      for t in range(class_num):
-        g_true[test_batch_msk[:,:,t]==1] = t+1
-        thresholded = np.zeros_like(predict_mask_batch[:,:,t])
-        thresholded[predict_mask_batch[:,:,t]>thresholds[t]] = 1
-        predict_mask_thred[thresholded==1] = t+1
-        
-      pred_f = K.flatten(results)
-      g_true_f = K.flatten(g_true)
+    pred_f = pred.reshape(-1,4)
+    true_f = true_batch_squ.reshape(-1,4)
+   
+    for idx, threshold in enumerate(thresholds):
+      for i in range(4):
+        pred = (pred_f[:,i] >threshold).astype('int')
 
-      # Calculate confusion matrix for each image per pixel.
-      cm = confusion_matrix(g_true_f, pred_f, labels=[i for i in range(class_num)]) 
-      cm_sum = cm_sum + cm # Sum each image 
-     
-  # Convert confusion matrix values to percentage
-  np.set_printoptions(suppress=True, precision=2)
-  cm_sum_mean = np.round((cm_sum.astype('float') / cm_sum.sum(axis=1).T[:,np.newaxis]),2)
+        result['true_positives'].iloc[idx][i] += np.sum(pred * true_f[:,i], axis=0)
+        result['false_positives'].iloc[idx][i] += np.sum((1 - true_f[:,i]) * pred, axis=0)
+        result['false_negatives'].iloc[idx][i] += np.sum(true_f[:,i] * (1-pred), axis=0)
 
-  # Plot confusion matrix
-  target_names = ['Background', 'Defect1', 'Defect2', 'Defect3', 'Defect4']
-  plot_confusion_matrix(cm_sum_mean, target_names=target_names, title_name='Confusion matrix', cmap=None, normalize=True, result_name=result_name)
+  for i in range(len(result)):
+    for j in range(4):
+      result['precision'][i][j] = np.round(result['true_positives'][i][j] / (result['true_positives'][i][j] + result['false_positives'][i][j] + K.epsilon()), 3)
+      result['recall'][i][j] = np.round(result['true_positives'][i][j] / (result['true_positives'][i][j] + result['false_negatives'][i][j] + K.epsilon()), 3)
+      result['f1_score'][i][j] = np.round(2*(result['precision'][i][j] * result['recall'][i][j]) / (result['precision'][i][j] + result['recall'][i][j] + K.epsilon()),3)
+
+  result_list = result['f1_score'].values.tolist()
+  result_list = np.array(result_list)
+  for i in range(4):
+    idx = np.argmax(result_list[:,i])
+    print('Defect{}: best threshold:{}, F1_score:{}'.format(i+1, result['threshold'][idx], result_list[:,i][idx]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -75,5 +91,4 @@ if __name__ == '__main__':
     parser.add_argument('--img_size', nargs='+', type=int, default=[256, 1600, 1], help='[height, width, channel] image sizes')
     parser.add_argument('--backbone', type=str, default='efficientnetb2', help='model backbone. efficientnetb0-5, resnet34')
     parser.add_argument('--class_num', type=int, default=4)
-    parser.add_argument('--result_save', type=str, default='./result)
     opt = parser.parse_args()
