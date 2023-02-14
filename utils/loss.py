@@ -208,11 +208,12 @@ class CCEDiceLoss(tf.keras.losses.Loss):
         dice = self.dice_loss(gt, pr)
         loss = self.CCE_weights*cce + self.Dice_weights*dice
         return loss
-      
-      
-def binary_crossentropy(gt, pr, **kwargs):
-    
-    return K.mean(K.binary_crossentropy(gt, pr))
+        
+def binary_crossentropy(gt, pr, class_weights=None, **kwargs):
+    if class_weights is None:
+      return K.mean(K.binary_crossentropy(gt, pr))
+    else:
+      return K.mean(K.binary_crossentropy(gt, pr)*class_weights)
 
 class BinaryCELoss(tf.keras.losses.Loss):
     """Creates a criterion that measures the Binary Cross Entropy between the
@@ -223,11 +224,12 @@ class BinaryCELoss(tf.keras.losses.Loss):
         or combined with other losses.
     """
 
-    def __init__(self):
+    def __init__(self, class_weights=None):
         super().__init__(name='binary_crossentropy')
+        self.class_weights = class_weights
 
     def __call__(self, gt, pr):
-        return binary_crossentropy(gt, pr)
+        return binary_crossentropy(gt, pr, self.class_weights)
 
 class BCEDiceLoss(tf.keras.losses.Loss):
   
@@ -246,7 +248,7 @@ class BCEDiceLoss(tf.keras.losses.Loss):
         self.per_image_all = per_image_all
 
         if self.BCE_weights !=0:
-          self.bce_loss = BinaryCELoss()
+          self.bce_loss = BinaryCELoss(self.class_weights)
 
         if self.Dice_weights !=0:
           self.dice_loss = DiceLoss(beta = self.beta,
