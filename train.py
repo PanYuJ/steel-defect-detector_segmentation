@@ -57,7 +57,7 @@ def train(opt):
   # Prepare training data and validation data.
   augmentations = A.Compose([ A.HorizontalFlip(p=0.5),
                               A.VerticalFlip(p=0.5),
-                              ], p=0.75)
+                              ])
 
   train_batches = DataGenerator(df=train_df, 
                                 img_path=file_path, 
