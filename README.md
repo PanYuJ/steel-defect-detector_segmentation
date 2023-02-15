@@ -15,7 +15,7 @@ Source from Kaggle: [Severstal: Steel Defect Detection](https://www.kaggle.com/c
 pip install -r requirements.txt
 ```
 
-## Introduction
+## Dataset
 
 - Four defects type in dataset. The example of each defect type is shown as below.
 
@@ -31,26 +31,22 @@ pip install -r requirements.txt
   - Defect 4.  
   <img src="images/defect4-1.png" align="center" width="50%"/>
 
-- The percentage of each defect are shown as below. The percentage defect 3 is more than half of dataset. 
-<img src="images/data_static.png" align="center" width="60%"/>
+- The count of each defect are shown as below. This dataset is imbalanced.  
+  <img src="images/data_static.jpg" align="center" width="40%"/>
 
-- Analyze mask area sizes  
-<img src="images/defect_pixel_jistogram1.png" align="center" width="50%"/>
+## Summary
+- Trying two model:
 
-- Plot images with large mask areas(>200000 pixel) picked by random index.  Defect 3 masks seem to contain a lot of empty space without any defects.  
-<img src="images/image with large mask_defect3.png" align="center" width="50%"/>
+|[Unet](https://arxiv.org/abs/1505.04597)|[Feature Pyramid Network (FPN)](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)|
+|:--:|:--:|
+|<img src="images/unet.png" align="center" width="70%"/>|<img src="images/fpn.png" align="center" width="70%"/>|
 
-## Define trainng model
-- ResUnet (Residual U-Net)
-<img src="images/unet model.png" align="center" width="80%"/>
+- Using ``EfficientNet`` for encoder to extract feature.
+- Activation function: ``Sigmoid``
+- Add class_weights for each class to balance dataset.
+- Loss function: ``binary_cross_entropy`` + ``Dice loss``  
+- Optimizer: ``Adam``
 
-- Loss function
-  - Add class_weights for each class to balance dataset.
-  - ``Catagorical_cross_entropy`` + ``Dice loss``
-  - ``Catagorical_cross_entropy`` 
-- Optimizer
-  - ``Adam``
-   
 ## Evaluation
  - Create confusion matrix for each pixel. It is shown as below. 
  - The precision of model using CCE is better than using CCE+Dice in this case.
