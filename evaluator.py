@@ -23,8 +23,8 @@ def evaluator(opt):
   model = model(backbone, img_shape=img_size, classes=class_num, weights=weights)
 
   # Create dataframe for evaluating .
-  file_path = './kaggle'
-  _, val_df = loader(file_path, crop=True)
+  file_path = './kaggle/train_images'
+  _, val_df = loader(file_path, crop=False)
 
   # set the evaluation data to batch to avoid OOM.
   # 100 image per batch.
