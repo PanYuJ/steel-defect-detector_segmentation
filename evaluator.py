@@ -14,17 +14,12 @@ from sklearn.metrics import confusion_matrix
 
 def evaluator(opt):
   
-  weights, img_size, backbone, class_num= opt.weights, opt.img_size, opt.backbone, opt.class_num
+  weights, img_size, backbone, class_num, csv_path, img_path = opt.weights, opt.img_size, opt.backbone, opt.class_num, opts.csv_path, opt.img_path
   
- # Create repository to store evaluating results.
-  if not os.path.exists(save_dir):
-    os.mkdir(opts.save_path)
-    
   model = model(backbone, img_shape=img_size, classes=class_num, weights=weights)
 
   # Create dataframe for evaluating .
-  file_path = './kaggle/train_images'
-  _, val_df = loader(file_path, crop=False)
+  _, val_df = loader(csv_path, tile=False)
 
   # set the evaluation data to batch to avoid OOM.
   # 100 image per batch.
@@ -46,7 +41,7 @@ def evaluator(opt):
   # Predict.
   for begin in np.arange(0,len(val_df),blockLength):
     test_batch = DataGenerator(val_df[begin:begin+blockLength:1], 
-                               img_path=file_path, 
+                               img_path=img_path, 
                                subset='val', 
                                batch_size=1, 
                                shuffle=False, 
@@ -86,7 +81,8 @@ def evaluator(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--save_dir', type=str, default='./result', help='save path for training weight and log.csv')
+    parser.add_argument('--img_path', type=str, default='./result', help='The path of images')
+    parser.add_argument('--csv_path', type=str, default='./result', help='The path of data csv file')
     parser.add_argument('--weights', type=str, default='', help='training weights path')
     parser.add_argument('--img_size', nargs='+', type=int, default=[256, 1600, 1], help='[height, width, channel] image sizes')
     parser.add_argument('--backbone', type=str, default='efficientnetb2', help='model backbone. efficientnetb0-5, resnet34')
