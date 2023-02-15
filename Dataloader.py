@@ -14,21 +14,16 @@ def split_df(df, trsize):
   print('train_df length: ', len(train_df), 'valid_df length: ', len(valid_df)) 
   return train_df, valid_df    
 
-def loader(file_path, tile=False):
+def loader(csv_path, tile=False):
  
     """
     Arg:
-      file_path: The path of repository that storing Raw datas.
-      zip_path: The path of zip file.
-      crop: Crop image into 
+      csv_path: The path of csv file.
+      tile: tile image.
     """
-  # Extract zip file including image and label after download from Kaggle  
-    if not os.path.isdir(file_path):
-        os.makedirs(file_path)
-    
+
     # Bulid data list in pandas Dataframe
     ## Colume of list: ImageId_ClassId, ClassId, EncodedPixels
-    csv_path = os.path.join(file_path, 'train.csv')
     df = pd.read_csv(csv_path)
     
     df['ClassId'] = df['ClassId'].astype(int)
